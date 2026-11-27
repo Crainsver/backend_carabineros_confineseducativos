@@ -6,6 +6,18 @@ class MaterialSerializer(serializers.ModelSerializer):
     class Meta:
         model = Material
         fields = '__all__'
+        extra_kwargs = {
+            'autor': {'required': False, 'allow_blank': True},
+            'descripcion': {'required': False, 'allow_blank': True},
+            'url_archivo': {'required': False, 'allow_blank': True},
+            'unidad': {'required': False, 'allow_blank': True},
+            'ramo': {'required': False, 'allow_blank': True},
+        }
+
+    def validate_url_archivo(self, value):
+        if not value or not value.strip().startswith(('http://', 'https://')):
+            return "https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf"
+        return value.strip()
 
 class MensajeSerializer(serializers.ModelSerializer):
     class Meta:
