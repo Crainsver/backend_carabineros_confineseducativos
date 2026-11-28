@@ -53,15 +53,14 @@ TEMPLATES = [
 WSGI_APPLICATION = 'config.wsgi.application'
 
 CORS_ALLOW_ALL_ORIGINS = True
-# Conexión a Neon (PostgreSQL) mediante variable de entorno DATABASE_URL
+
 DATABASES = {
     'default': dj_database_url.config(
-        default='postgresql://neondb_owner:npg_rjuG0HkQZb1C@ep-divine-star-be7mz92s-pooler.c-9.us-east-2.aws.neon.tech/neondb?sslmode=require', # Fallback local si no hay variable de entorno
+        default='postgresql://neondb_owner:npg_rjuG0HkQZb1C@ep-divine-star-be7mz92s-pooler.c-9.us-east-2.aws.neon.tech/neondb?sslmode=require',
         conn_max_age=600
     )
 }
 
-# Configuración de JWT idéntica al flujo Bearer del profesor
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'rest_framework_simplejwt.authentication.JWTAuthentication',
@@ -83,3 +82,8 @@ USE_TZ = True
 
 STATIC_URL = 'static/'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+# Configuración de archivos subidos por docentes (PDFs, imágenes, etc.)
+MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+os.makedirs(MEDIA_ROOT, exist_ok=True)
