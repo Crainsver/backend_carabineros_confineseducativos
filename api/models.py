@@ -15,10 +15,11 @@ class PerfilUsuario(models.Model):
 
 class Material(models.Model):
     titulo = models.CharField(max_length=200)
-    unidad = models.CharField(max_length=100) # Ej: "Unidad 1: Procedimientos"
+    unidad = models.CharField(max_length=100)
     ramo = models.CharField(max_length=100, default="Procedimientos Policiales")
     descripcion = models.TextField()
-    url_pdf = models.URLField(max_length=500) # Link directo a PDF para descarga offline
+    archivo = models.FileField(upload_to='materiales/', null=True, blank=True)
+    url_pdf = models.CharField(max_length=500, blank=True, default="")
     fecha_creacion = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
@@ -26,7 +27,7 @@ class Material(models.Model):
 
 class Mensaje(models.Model):
     remitente_nombre = models.CharField(max_length=150)
-    rol_remitente = models.CharField(max_length=20) # DOCENTE o ESTUDIANTE
+    rol_remitente = models.CharField(max_length=20)
     asignatura = models.CharField(max_length=100)
     pregunta = models.TextField()
     respuesta = models.TextField(blank=True, default="")

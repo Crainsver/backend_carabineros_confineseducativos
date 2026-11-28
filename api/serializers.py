@@ -3,30 +3,25 @@ from django.contrib.auth.models import User
 from .models import PerfilUsuario, Material, Mensaje, ProgresoEstudiante
 
 class MaterialSerializer(serializers.ModelSerializer):
-    url_pdf = serializers.CharField(required=False, allow_blank=True, write_only=True)
+    url_pdf = serializers.SerializerMethodField()
 
     class Meta:
         model = Material
-        fields = '__all__'
+        fields = ['id', 'titulo', 'unidad', 'ramo', 'descripcion', 'archivo', 'url_pdf', 'fecha_creacion']
         extra_kwargs = {
-            'autor': {'required': False, 'allow_blank': True},
+            'archivo': {'required': False, 'write_only': True},
             'descripcion': {'required': False, 'allow_blank': True},
             'unidad': {'required': False, 'allow_blank': True},
             'ramo': {'required': False, 'allow_blank': True},
         }
 
-    def create(self, validated_data):
-        url_recibida = validated_data.pop('url_pdf', '') or validated_data.get('url_archivo', '')
-        if not url_recibida or not str(url_recibida).strip().startswith(('http://', 'https://')):
-            url_recibida = "https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf"
-
-        campos_modelo = {f.name for f in Material._meta.get_fields()}
-        if 'url_pdf' in campos_modelo:
-            validated_data['url_pdf'] = url_recibida
-        elif 'url_archivo' in campos_modelo:
-            validated_data['url_archivo'] = url_recibida
-
-        return super().create(validated_data)
+    def get_url_pdf(self, obj):
+        request = self.context.get('request')
+        if obj.archivo:
+            if request is not None:
+                return request.build_absolute_uri(obj.archivo.url)
+            return obj.archivo.url
+        return obj.url_pdf or ""
 
 class MensajeSerializer(serializers.ModelSerializer):
     class Meta:

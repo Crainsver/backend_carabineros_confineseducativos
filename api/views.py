@@ -2,6 +2,7 @@ from rest_framework import status, generics
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.permissions import AllowAny, IsAuthenticated
+from rest_framework.parsers import MultiPartParser, FormParser, JSONParser
 from django.contrib.auth import authenticate
 from rest_framework_simplejwt.tokens import RefreshToken
 from .models import Material, Mensaje, ProgresoEstudiante, PerfilUsuario
@@ -38,11 +39,12 @@ class LoginView(APIView):
             }, status=status.HTTP_200_OK)
         return Response({"error": "Credenciales inválidas"}, status=status.HTTP_401_UNAUTHORIZED)
 
-# 3. MATERIALES POR UNIDAD (Protegido con JWT)
+# 3. MATERIALES POR UNIDAD (Protegido con JWT y soporte de archivos Multipart)
 class MaterialListCreateView(generics.ListCreateAPIView):
     queryset = Material.objects.all().order_by('-fecha_creacion')
     serializer_class = MaterialSerializer
     permission_classes = [IsAuthenticated]
+    parser_classes = [MultiPartParser, FormParser, JSONParser]
 
 # 4. MENSAJES DOCENTE <-> ESTUDIANTE (Protegido con JWT)
 class MensajeListCreateView(generics.ListCreateAPIView):
@@ -81,7 +83,7 @@ class ProgresoView(APIView):
         return Response({
             "total": total_materiales,
             "completados": completados,
-            "porcentaje": round(porcentaje, 2), # Ej: 0.75 (75%)
+            "porcentaje": round(porcentaje, 2),
             "idsCompletados": ids_completados
         })
 
